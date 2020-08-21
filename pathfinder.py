@@ -2,7 +2,7 @@ import pyglet
 import math
 from queue import PriorityQueue
 
-gridsize = 25
+gridsize = 128
 
 bat=pyglet.graphics.Batch()
 
