@@ -132,12 +132,12 @@ def get_path(start,end):#A* power
 	
 	while j>0 and not found:
 		j-=1
-		print(f"Try {4096-j}/4096",end="\r")
 		if nodes:
 			curnode=min(nodes)#this works
 		else:
 			return
 		dc,dist,cost,x,y=curnode
+		print(f"\033[2KTry {4096-j}/4096 cost {cost}",end="\r")
 		#doing it once with normal directions, and once with diagonal ones.
 		for rang,cst in ((((x+1,y),(x-1,y),(x,y+1),(x,y-1)),cost+1),(((x+1,y+1),(x-1,y+1),(x+1,y-1),(x-1,y-1)),cost+1.5)):
 			for _x,_y in rang:
@@ -159,8 +159,8 @@ def get_path(start,end):#A* power
 		del nodes[nodes.index(curnode)]#remove node from nodes since it looked at all sourrounding nodes
 		if win.gen:
 			yield curnode,nodes
+	print()
 	if j<=0:#no path found
-		print()
 		return
 	found=False
 	path=[]
