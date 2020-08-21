@@ -149,7 +149,9 @@ def get_path(start,end):#A* power
 					continue
 				repl=covered[_x][_y]
 				if repl:
-					continue
+					if repl[2]>cst:
+						repl[0]+=cst-repl[2]
+						repl[2]=cst
 				else:
 					val=win.map[_x][_y]
 					if val==1:#wall
