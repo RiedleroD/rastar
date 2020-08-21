@@ -153,6 +153,22 @@ def get_path(start,end):#A* power
 				node=get_node(_x,_y,cost+1,*end)
 				nodes.append(node)
 				covered[_x][_y]=node
+		for _x,_y in ((x+1,y+1),(x-1,y+1),(x+1,y-1),(x-1,y-1)):
+			if not 0<=_x<gridsize or not 0<=_y<gridsize:#if out of grid
+				continue
+			repl=covered[_x][_y]
+			if repl:
+				continue
+			else:
+				val=win.map[_x][_y]
+				if val==1:#wall
+					continue
+				elif val==3:#end
+					found=True
+					break
+				node=get_node(_x,_y,cost+1.5,*end)
+				nodes.append(node)
+				covered[_x][_y]=node
 		del nodes[nodes.index(curnode)]#remove node from nodes since it looked at all sourrounding nodes
 		if win.gen:
 			yield curnode,nodes
@@ -166,7 +182,7 @@ def get_path(start,end):#A* power
 	while j>=0:
 		j-=1
 		print(f"path {4096-j}/4096",end="\r")
-		for _x,_y in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
+		for _x,_y in ((x+1,y),(x-1,y),(x,y+1),(x,y-1),(x+1,y+1),(x-1,y+1),(x+1,y-1),(x-1,y-1)):
 			node=covered[_x][_y]
 			if node:
 				dc,dist,cost,_x,_y=node
