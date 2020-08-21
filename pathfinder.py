@@ -103,12 +103,16 @@ class Window(pyglet.window.Window):
 			pyglet.clock.unschedule(self.update)
 		else:
 			x,y=curnode[-2:]
-			if self.map[x][y]==4:
-				self.map[x][y]=0
-			for node in nodes:
-				x,y=node[-2:]
+			if nodes==None:
 				if self.map[x][y]==0:
 					self.map[x][y]=4
+			else:
+				if self.map[x][y]==4:
+					self.map[x][y]=0
+				for node in nodes:
+					x,y=node[-2:]
+					if self.map[x][y]==0:
+						self.map[x][y]=4
 
 win=Window()
 
@@ -178,8 +182,8 @@ def get_path(start,end):#A* power
 						for i in range(gridsize):
 							if col[i]==4:
 								col[i]=0
-					for x,y in path:
-						win.map[x][y]=4
+					for node in path:
+						yield node,None
 					print()
 					return
 				elif cost<sc:
