@@ -183,7 +183,11 @@ def get_path(start,end):#A* power
 							if col[i]==4:
 								col[i]=0
 					for node in path:
-						yield node,None
+						if win.gen:
+							yield node,None
+						else:
+							x,y=node
+							win.map[x][y]=4
 					print()
 					return
 				elif cost<sc:
