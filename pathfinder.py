@@ -89,9 +89,14 @@ class Window(pyglet.window.Window):
 				for y in range(gridsize):
 					if col[y]==4:
 						col[y]=0
+			if self.gen:
+				pyglet.clock.unschedule(self.update)
 			self.gen=get_path(self._start,self._end)
 			pyglet.clock.schedule_interval(self.update,1/60)
 		elif sym==pyglet.window.key.ENTER and self._start and self._end:
+			if self.gen:
+				pyglet.clock.unschedule(self.update)
+				self.gen=None
 			for col in self.map:
 				for y in range(gridsize):
 					if col[y]==4:
@@ -107,6 +112,7 @@ class Window(pyglet.window.Window):
 			curnode,nodes=next(self.gen)
 		except StopIteration:
 			pyglet.clock.unschedule(self.update)
+			self.gen=None
 		else:
 			x,y=curnode[-2:]
 			if nodes==None:
