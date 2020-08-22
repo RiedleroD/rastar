@@ -24,9 +24,10 @@ class Window(pyglet.window.Window):
 	gen=None#A* generator
 	def __init__(self):
 		global WIDTH,HEIGHT
-		super().__init__(caption='A* path finding!')
+		super().__init__(caption='A* path finding!',vsync=True)
 		self.maximize()
 		self.map=[[0]*gridsize for i in range(gridsize)]
+		self.mmap=[None]*gridsize
 		#0→ nothing 
 		#1→ wall
 		#2→ start
@@ -34,25 +35,30 @@ class Window(pyglet.window.Window):
 		#4→ path
 	def on_draw(self):
 		self.clear()
-		todraw=[(),()]#verteces,colors
-		for x,col in enumerate(self.map):
-			for y,cell in enumerate(col):
-				cl=None
-				if cell==1:
-					cl=WHITE
-				elif cell==2:
-					cl=ORANGE
-				elif cell==3:
-					cl=PURPLE
-				elif cell==4:
-					cl=CYAN
-				if cl:
-					x_,y_,_x,_y=WIDTH*x/gridsize,HEIGHT*y/gridsize,WIDTH*(x+1)/gridsize,HEIGHT*(y+1)/gridsize
-					todraw[0]+=(x_,y_,_x,y_,_x,_y,x_,_y)
-					todraw[1]+=cl*4
-		if self.qvl:
-			self.qvl.delete()
-		self.qvl=bat.add(len(todraw[0])//2,pyglet.gl.GL_QUADS,None,('v2f',todraw[0]),('c3B',todraw[1]))
+		if self.map!=self.mmap:
+			#map.copy() only copies the references to the submaps and therefore doesn't work
+			#also, this only copies columns that have been changed and just leaves unchanged columns in place
+			self.mmap=[col.copy() if col!=ccol else ccol for col,ccol in zip(self.map,self.mmap)]
+			verts=()
+			colors=()
+			for x,col in enumerate(self.map):
+				for y,cell in enumerate(col):
+					cl=None
+					if cell==1:
+						cl=WHITE
+					elif cell==2:
+						cl=ORANGE
+					elif cell==3:
+						cl=PURPLE
+					elif cell==4:
+						cl=CYAN
+					if cl:
+						x_,y_,_x,_y=WIDTH*x/gridsize,HEIGHT*y/gridsize,WIDTH*(x+1)/gridsize,HEIGHT*(y+1)/gridsize
+						verts+=(x_,y_,_x,y_,_x,_y,x_,_y)
+						colors+=cl*4
+			if self.qvl:
+				self.qvl.delete()
+			self.qvl=bat.add(len(verts)//2,pyglet.gl.GL_QUADS,None,('v2f',verts),('c3B',colors))
 		bat.draw()
 		pyglet.clock.tick()
 	def on_mouse_press(self,x,y,btn,mods):
