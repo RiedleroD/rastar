@@ -235,7 +235,7 @@ def get_path(start,end):#A* power
 	print("oof→")
 
 for col in range(gridsize+1):
-	x=1+WIDTH*col/gridsize
+	x=WIDTH*col/gridsize
 	lvl+=(x,0,x,HEIGHT)
 for row in range(gridsize+1):
 	y=HEIGHT*row/gridsize
