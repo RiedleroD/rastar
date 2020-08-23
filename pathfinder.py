@@ -22,6 +22,7 @@ class Window(pyglet.window.Window):
 	_start=None
 	_end=None
 	gen=None#A* generator
+	dragtyp=None
 	def __init__(self):
 		global WIDTH,HEIGHT
 		super().__init__(caption='A* path finding!',vsync=True)
@@ -67,13 +68,15 @@ class Window(pyglet.window.Window):
 			x_=gridsize-1
 		if y_>gridsize-1:
 			y_=gridsize-1
-		if self.map[x_][y_]==2:
+		typ=self.map[x_][y_]
+		self.dragtyp=typ
+		if typ==2:
 			self._start=None
 			self.map[x_][y_]=0
-		elif self.map[x_][y_]==3:
+		elif typ==3:
 			self._end=None
 			self.map[x_][y_]=0
-		elif self.map[x_][y_]==1:
+		elif typ==1:
 			self.map[x_][y_]=0
 		elif not self._start:
 			self._start=(x_,y_)
@@ -83,6 +86,21 @@ class Window(pyglet.window.Window):
 			self.map[x_][y_]=3
 		else:
 			self.map[x_][y_]=1
+	def on_mouse_drag(self,x,y,dx,dy,buttons,modifiers):
+		if self._start and self._end:
+			x_,y_=gridsize*x//WIDTH,gridsize*y//HEIGHT
+			if x_>gridsize-1:
+				x_=gridsize-1
+			if y_>gridsize-1:
+				y_=gridsize-1
+			typ=self.map[x_][y_]
+			if 3!=typ!=2:
+				if typ==1==self.dragtyp:
+					self.map[x_][y_]=0
+				elif typ==0==self.dragtyp:
+					self.map[x_][y_]=1
+	def on_mouse_release(self,x,y,button,modifiers):
+		self.dragtyp=None
 	def on_key_press(self,sym,mods):
 		if sym==pyglet.window.key.SPACE and self._start and self._end:
 			for col in self.map:
