@@ -20,7 +20,7 @@ MAXTRIES=2**14#max results in about 4.5 minutes of waiting at 60fps
 
 class Window(pyglet.window.Window):
 	lvl=None#line vector list
-	qvl=None#quad vector list
+	qvl=[None for i in range(gridsize)]#quad vector list list
 	_start=None
 	_end=None
 	gen=None#A* generator
@@ -38,13 +38,11 @@ class Window(pyglet.window.Window):
 		#4→ path
 	def on_draw(self):
 		self.clear()
-		if self.map!=self.mmap:
-			#map.copy() only copies the references to the submaps and therefore doesn't work
-			#also, this only copies columns that have been changed and just leaves unchanged columns in place
-			self.mmap=[col.copy() if col!=ccol else ccol for col,ccol in zip(self.map,self.mmap)]
-			verts=()
-			colors=()
-			for x,col in enumerate(self.map):
+		for x,(col,ccol) in enumerate(zip(self.map,self.mmap)):
+			if col!=ccol:
+				self.mmap[x]=col.copy()
+				verts=()
+				colors=()
 				for y,cell in enumerate(col):
 					cl=None
 					if cell==1:
@@ -59,9 +57,9 @@ class Window(pyglet.window.Window):
 						x_,y_,_x,_y=WIDTH*x/gridsize,HEIGHT*y/gridsize,WIDTH*(x+1)/gridsize,HEIGHT*(y+1)/gridsize
 						verts+=(x_,y_,_x,y_,_x,_y,x_,_y)
 						colors+=cl*4
-			if self.qvl:
-				self.qvl.delete()
-			self.qvl=bat.add(len(verts)//2,pyglet.gl.GL_QUADS,None,('v2f',verts),('c3B',colors))
+				if self.qvl[x]:
+					self.qvl[x].delete()
+				self.qvl[x]=bat.add(len(verts)//2,pyglet.gl.GL_QUADS,None,('v2f',verts),('c3B',colors))
 		bat.draw()
 		pyglet.clock.tick()
 	def on_mouse_press(self,x,y,btn,mods):
