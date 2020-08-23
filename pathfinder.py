@@ -16,6 +16,8 @@ ORANGE = (255, 165, 0) #Start
 PURPLE = (128, 0 , 128) #End
 CYAN = (64, 224, 208) #Path
 
+MAXTRIES=2**14#max results in about 4.5 minutes of waiting at 60fps
+
 class Window(pyglet.window.Window):
 	lvl=None#line vector list
 	qvl=None#quad vector list
@@ -161,17 +163,17 @@ def get_path(start,end):#A* power
 	nodes=[]#only nodes where there's an adjacent node that's not been looked at
 	covered=[[None for y in range(gridsize)] for x in range(gridsize)]
 	nodes.append(get_node(*start,0,*end))
-	j=4096#number of tries before quitting
+	j=0
 	found=False
 	
-	while j>0 and not found:
-		j-=1
+	while j<MAXTRIES and not found:
+		j+=1
 		if nodes:
 			curnode=min(nodes)#this works
 		else:
 			return
 		dc,dist,cost,x,y=curnode
-		print(f"\033[2KTry {4096-j}/4096 cost {cost}",end="\r")
+		print(f"\033[2KTry {j}/{MAXTRIES} cost {cost}",end="\r")
 		#doing it once with normal directions, and once with diagonal ones.
 		for rang,cst in ((((x+1,y),(x-1,y),(x,y+1),(x,y-1)),cost+1),(((x+1,y+1),(x-1,y+1),(x+1,y-1),(x-1,y-1)),cost+1.5)):
 			for _x,_y in rang:
@@ -202,9 +204,9 @@ def get_path(start,end):#A* power
 	path=[]
 	x,y=end
 	sc=gridsize
-	while j>=0:
+	while j>0:
 		j-=1
-		print(f"path {4096-j}/4096",end="\r")
+		print(f"path {MAXTRIES-j}/{MAXTRIES}",end="\r")
 		for _x,_y in ((x+1,y),(x-1,y),(x,y+1),(x,y-1),(x+1,y+1),(x-1,y+1),(x+1,y-1),(x-1,y-1)):
 			node=covered[_x][_y]
 			if node:
@@ -230,7 +232,7 @@ def get_path(start,end):#A* power
 		for i in range(gridsize):
 			if col[i]==4:
 				col[i]=0
-	print("oof")
+	print("oof→")
 
 for col in range(gridsize+1):
 	x=1+WIDTH*col/gridsize
